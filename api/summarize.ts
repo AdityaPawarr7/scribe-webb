@@ -1,5 +1,5 @@
 // Vercel serverless function. Concentrate key lives ONLY here.
-export const config = { runtime: 'nodejs' }
+export const config = { runtime: 'edge' }
 
 interface Body {
   transcript: string
@@ -59,6 +59,7 @@ function extractText(data: ResponsesPayload): string {
 }
 
 export default async function handler(req: Request): Promise<Response> {
+  try {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
@@ -134,4 +135,10 @@ ${transcript}`
     status: 200,
     headers: { 'content-type': 'application/json' }
   })
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: 'exception', detail: String(err).slice(0, 500) }),
+      { status: 500, headers: { 'content-type': 'application/json' } }
+    )
+  }
 }
