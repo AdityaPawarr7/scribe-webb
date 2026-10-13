@@ -1,14 +1,27 @@
-# Scribe — a local-first AI meeting notepad (web)
+<div align="center">
 
-Record a lecture, crit or meeting. Scribe transcribes it **on your device** with Whisper, then sends only the transcript text to an LLM for a titled summary with action items. Notes and reminders stay in your browser.
+# Scribe
 
-Built for *Applied AI Tools — Project 1: Human-guided software development*. Web companion to my native app, [AdityaPawarr7/scribe](https://github.com/AdityaPawarr7/scribe).
+**A local-first AI meeting notepad for the browser.**
+Record a lecture, crit or meeting. Whisper transcribes it on your device; only the text goes to an LLM for a titled summary with action items.
 
-**Live demo:** _add Vercel URL_ · **Demo video (1–3 min):** _add link_ · **Repo:** this one
+[**Live demo**](#) &nbsp;·&nbsp; [**Demo video**](#) &nbsp;·&nbsp; [Native app](https://github.com/AdityaPawarr7/scribe)
 
+`Vite` `React` `TypeScript` `Tailwind` `Dexie / IndexedDB` `Whisper (in-browser)` `Vercel Edge` `Concentrate API`
+
+</div>
+
+> Built for *Applied AI Tools, Project 1: Human-guided software development*.
 > **Disclosure:** I work at Concentrate AI. Scribe uses the Concentrate API for model access.
 
-**Contents:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
+| | |
+|---|---|
+| **Private by design** | Audio never leaves your browser; only transcript text is sent, and only when you ask for a summary |
+| **Free to run** | Local Whisper, free-tier model, no accounts |
+| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 20 automated tests |
+| **Built with documented AI use** | 16 logged experiments and a reusable protocol, below |
+
+**Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
 
 ---
 
@@ -84,7 +97,12 @@ IndexedDB (meeting) + rendered UI
 
 **Where Scribe fits:** local transcription, an AI *highlights layer* shaped by the user's own notes, one browser-local dashboard, any audio source.
 
-**AI reflection.** *Helped:* reframing my first pitch ("open-source Granola on the web") from a product into a problem, which made the interview questions honest, and stress-testing the pattern across interviews. *Risk:* AI validates whatever problem statement I write, so enthusiasm gets echoed back as "research." *Mitigation:* I framed the problem before interviewing, then kept only the claims the quotes support. *Not AI:* choosing which alternatives to compare; that came from knowing the space (I built the native version).
+> **AI reflection**
+>
+> - **Helped:** reframing my first pitch ("open-source Granola on the web") from a product into a problem, which made the interview questions honest, and stress-testing the pattern across interviews.
+> - **Risk:** AI validates whatever problem statement I write, so enthusiasm gets echoed back as "research."
+> - **Mitigation:** I framed the problem before interviewing, then kept only the claims the quotes support.
+> - **Not AI:** choosing which alternatives to compare; that came from knowing the space (I built the native version).
 
 ---
 
@@ -134,7 +152,12 @@ Quotes: P2, *"Copying it down, but then I lose the train of thought for a second
 
 Reminders were originally deferred because they came from one participant. After P1 raised them twice unprompted I built them as the second entity.
 
-**AI reflection.** *Helped:* turning quotes into needs and mapping stories to CRUD. *Risk:* generalising from thin data; two interviews could be laundered into "all students want reminders." *Mitigation:* every need carries a quote and single-source needs are labelled. *Not AI:* deciding what to defer; its instinct is to include everything.
+> **AI reflection**
+>
+> - **Helped:** turning quotes into needs and mapping stories to CRUD.
+> - **Risk:** generalising from thin data; two interviews could be laundered into "all students want reminders."
+> - **Mitigation:** every need carries a quote and single-source needs are labelled.
+> - **Not AI:** deciding what to defer; its instinct is to include everything.
 
 ### 2c. Technical research (plan vs. what shipped)
 Researched before coding; "shipped" is what actually happened.
@@ -154,7 +177,11 @@ Other research conclusions: tab audio via `getDisplayMedia` is Chrome/Edge only;
 
 **Lesson:** the research was right about architecture (local transcription, server-side key) and wrong about specifics (model, API shape, runtime). The specifics only surfaced by running code.
 
-**AI reflection.** *Helped:* comparison tables and drafting the server-function pattern. *Risk:* confidently wrong prices, quotas or API shapes. *What happened:* the API shape was exactly that kind of hallucination, caught by a 404 and a docs check, not by reviewing code. The pre-launch bundle grep for the key is clean (see testing).
+> **AI reflection**
+>
+> - **Helped:** comparison tables and drafting the server-function pattern.
+> - **Risk:** confidently wrong prices, quotas or API shapes.
+> - **What happened:** the API shape was exactly that kind of hallucination, caught by a 404 and a docs check, not by reviewing code. The pre-launch bundle grep for the key is clean (see testing).
 
 ### 2d. Sketches
 Three deliberately low-fi directions so none seduces by polish.
@@ -175,7 +202,11 @@ Three deliberately low-fi directions so none seduces by polish.
 
 **Picked sketch 1.** It maps cleanly to CRUD, mirrors habits both participants already have, and avoids a UX bet (the scrubber gets demoed, the summary gets re-read; chat hides mistakes in confident prose). Next: timestamps on notes (from 2) and an "ask this meeting" box (from 3), keeping enhanced notes as the primary record.
 
-**AI reflection.** *Helped:* generating three comparable SVGs quickly. *Risk:* AI makes every sketch look slick, so the comparison lies. *Mitigation:* low-fi on purpose, and I wrote the compare-and-contrast and made the pick myself.
+> **AI reflection**
+>
+> - **Helped:** generating three comparable SVGs quickly.
+> - **Risk:** AI makes every sketch look slick, so the comparison lies.
+> - **Mitigation:** low-fi on purpose, and I wrote the compare-and-contrast and made the pick myself.
 
 ---
 
@@ -184,7 +215,9 @@ Three deliberately low-fi directions so none seduces by polish.
 **Shipped:** mic recording; local Whisper in a Web Worker; editable notes beside the transcript; AI summary via an Edge function; Meetings CRUD with Rendered/Raw toggle; Reminders CRUD (second entity) with "+ reminder" and a backlink; sample-data seed/clear (`sample-` id prefix); in-memory rate limit; error boundary.
 **Cut:** tab audio, chat, streaming transcription, diarization, accounts/sync, calendar.
 
-**Build log**
+<details>
+<summary><b>Build log (10 steps)</b></summary>
+
 1. Scaffold (Vite + React + TS + Tailwind + Dexie): AI did it in one pass.
 2. Whisper: blank page from an eager import (`registerBackend`); fixed with a lazy import.
 3. Bad transcripts (`[S]`, then `[Music]`): no 16 kHz resample; also moved to `whisper-small.en`.
@@ -196,7 +229,15 @@ Three deliberately low-fi directions so none seduces by polish.
 9. Long-audio freeze: Whisper moved into a Web Worker (unverified on long audio).
 10. Tests and sample data; seed data exposed a "due today shows overdue" bug.
 
-**AI reflection.** *Helped:* scaffolding, schemas, CRUD, UI, tests, and fast diagnosis from exact errors or screenshots. *Wrong:* library and platform specifics (API shape, Vercel config, first diagnosis of bad transcripts). *Harm risk:* a leaked key or an unbounded public endpoint; the key stays server-side, but the weak rate limit is the main known risk. *I did:* run every AI-written library call, break code on purpose to see tests fail, cut unsupported features. *Would change:* give AI the API docs up front, and write the long-audio test before the fix.
+</details>
+
+> **AI reflection**
+>
+> - **Helped:** scaffolding, schemas, CRUD, UI, tests, and fast diagnosis from exact errors or screenshots.
+> - **Wrong:** library and platform specifics (API shape, Vercel config, first diagnosis of bad transcripts).
+> - **Harm risk:** a leaked key or an unbounded public endpoint; the key stays server-side, but the weak rate limit is the main known risk.
+> - **I did:** run every AI-written library call, break code on purpose to see tests fail, cut unsupported features.
+> - **Would change:** give AI the API docs up front, and write the long-audio test before the fix.
 
 ---
 
@@ -208,7 +249,10 @@ Three deliberately low-fi directions so none seduces by polish.
 **Other checks:** typecheck clean; build succeeds; `grep -R "sk-cn\|CONCENTRATE_API_KEY" dist/` finds nothing (R10).
 **Not covered by automation:** the UI, mic recording, Whisper, `/api/summarize`, rate limiting. That is the manual checklist.
 
-**Manual checklist (run on the live URL)** ☐ = not yet run
+<details>
+<summary><b>Manual test checklist (T1 to T12, not yet run)</b></summary>
+
+Run on the live URL. ☐ = not yet run.
 
 | # | Steps | Expected | Result |
 |---|---|---|---|
@@ -225,16 +269,27 @@ Three deliberately low-fi directions so none seduces by polish.
 | T11 | DevTools → Network while recording | No audio uploaded; only `/api/summarize` carries text | ☐ |
 | T12 | Record 5+ min | UI stays responsive; progress % updates | ☐ |
 
+</details>
+
 **Participant feedback:** _to do. Send the URL to P1 or P2, record what they tried, what they said (quotes), and what I changed._
 
 **Deployment:** Vercel (static build + Edge function). `CONCENTRATE_API_KEY` is only in Vercel environment variables. Abuse limits as in *Known limitations*: fine for a class demo, not for real traffic.
 
-**AI reflection.** *Helped:* tests, seed data and the checklist. *Risk:* AI-written tests of AI-written code share blind spots; green checks can be an echo. *Mitigation:* the deliberate-breakage check and an honest "not covered" list. *Sample data* is invented, badged SAMPLE, and separable. *Didn't work:* AI picked a `vitest` too new for the project's Vite (pinned); and a bug it wrote (due-today shown as overdue) slipped past every test because the UI isn't tested. *Not AI:* running the checklist and getting participant feedback.
+> **AI reflection**
+>
+> - **Helped:** tests, seed data and the checklist.
+> - **Risk:** AI-written tests of AI-written code share blind spots; green checks can be an echo.
+> - **Mitigation:** the deliberate-breakage check and an honest "not covered" list. *Sample data* is invented, badged SAMPLE, and separable.
+> - **Didn't work:** AI picked a `vitest` too new for the project's Vite (pinned); and a bug it wrote (due-today shown as overdue) slipped past every test because the UI isn't tested.
+> - **Not AI:** running the checklist and getting participant feedback.
 
 ---
 
 ## GenAI experiments
-Raw log: ✅ worked, ❌→✅ failed first then fixed, ⏳ unverified.
+<details>
+<summary><b>Full experiment log (16 entries)</b></summary>
+
+✅ worked, ❌→✅ failed first then fixed, ⏳ unverified.
 
 | # | Step | What I asked | Result | |
 |---|---|---|---|---|
@@ -254,6 +309,8 @@ Raw log: ✅ worked, ❌→✅ failed first then fixed, ⏳ unverified.
 | 14 | 4 | Can the tests fail? | Broke code on purpose; M-D1, R-R2 failed | ✅ |
 | 15 | 4 | Due-today reminder showed overdue | Fixed `dueLabel`; found by seed data, not tests. TODO: add a test | ✅ |
 | 16 | 3 | Docs written by a cloud tool I expected on my machine | File never arrived; restored by explicit copy | ❌→✅ |
+
+</details>
 
 **What worked:** boilerplate, schemas, CRUD, tests, UI layout, and diagnosis whenever I pasted the exact error or a screenshot ("nothing shows up" got nowhere; the console screenshot fixed it in one turn).
 **What didn't:** library and platform specifics. Every wrong answer was caught by running the code, never by reading it.
