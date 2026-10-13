@@ -124,6 +124,14 @@ Quotes: P2, *"Copying it down, but then I lose the train of thought for a second
 
 **Limits of this evidence:** n = 2, and P2 was a proxy interview (the interviewer answered based on close knowledge of the person). Needs resting on one voice (reminders, N4) are labelled as such rather than generalised.
 
+> **AI reflection**
+>
+> - **Helped:** drafting the interview questions. I described the problem and the two kinds of participant, and AI produced a guide with a coverage map, follow-ups tailored to each participant's context, and a "don't say" list built from the three interview rules (talk about them not my idea, ask about past experience not future possibilities, listen more than talk). It also helped spot the shared pattern across the two sets of answers.
+> - **Risk:** leading or solution-flavoured questions that sound neutral; AI over-reading a thin transcript into confident "insights"; AI-written questions that sound like AI rather than a conversation.
+> - **Mitigation:** every question was checked against the three rules; findings keep verbatim quotes; single-source needs are labelled; participants are anonymised as P1 and P2.
+> - **Worked / didn't:** the "don't say" list and the per-participant follow-ups worked well. The guide was used as generated, with no edits of my own, so it inherits whatever blind spots the AI had.
+> - **Not AI:** running the conversations and listening. That part has to be a person.
+
 ### 2b. Needs, stories, requirements
 
 | # | Need | Evidence |
@@ -204,9 +212,10 @@ Three deliberately low-fi directions so none seduces by polish.
 
 > **AI reflection**
 >
-> - **Helped:** generating three comparable SVGs quickly.
-> - **Risk:** AI makes every sketch look slick, so the comparison lies.
-> - **Mitigation:** low-fi on purpose, and I wrote the compare-and-contrast and made the pick myself.
+> - **Helped:** I work from my own rough draft and feed it to AI to build on, which turns one idea into several comparable variations quickly. That let me compare three directions on paper before committing any to code.
+> - **Risk:** anchoring. If AI proposes the directions, my idea space shrinks to what it suggests, and a polished mockup of a weak idea reads as "ready to build".
+> - **Mitigation:** start from my own draft rather than a blank prompt, keep the sketches low-fi so none wins on polish, and write the compare-and-contrast and make the pick myself.
+> - **Creativity:** it helps with breadth (variations, alternatives I hadn't drawn) and hurts if I let it supply the first idea. The best use was as a second pair of hands on my sketch, not as the source.
 
 ---
 
@@ -337,6 +346,23 @@ Distilled from the log above.
 4. Make AI try to break its own work; passing tests alone prove little.
 5. Keep judgment calls (scope, picks, who to believe) with the human, because AI's instinct is to include everything and agree.
 6. Check files exist where you expect after the tool says "written."
+
+---
+
+## Appendix: full working docs
+The sections above condense the per-step documents. The originals, including the interview guide and notes, are kept in the repo:
+
+| Step | Full document |
+|---|---|
+| 1. Problem | [docs/archive/01-problem.md](docs/archive/01-problem.md) |
+| 2a. Interview guide (questions) | [docs/archive/02a-interviews/interview-guide.md](docs/archive/02a-interviews/interview-guide.md) |
+| 2a. Interview notes (anonymised) | [P1](docs/archive/02a-interviews/notes/P1.md) · [P2](docs/archive/02a-interviews/notes/P2.md) |
+| 2b. Needs, stories, requirements | [docs/archive/02b-requirements.md](docs/archive/02b-requirements.md) |
+| 2c. Technical research | [docs/archive/02c-research.md](docs/archive/02c-research.md) |
+| 2d. Sketches (AI-generated drafts) | [docs/archive/02d-sketches/](docs/archive/02d-sketches/) |
+| 3. Prototype notes | [docs/archive/03-prototype.md](docs/archive/03-prototype.md) |
+| 4. Testing | [docs/archive/04-testing.md](docs/archive/04-testing.md) |
+| AI experiment log (earlier version) | [docs/archive/ai-log.md](docs/archive/ai-log.md) |
 
 ---
 
