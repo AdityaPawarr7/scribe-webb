@@ -21,7 +21,7 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 | **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 24 automated tests |
 | **Built with documented AI use** | 16 logged experiments and a reusable protocol, below |
 
-**Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
+**Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Constitution](#reflection-against-the-class-genai-constitution) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
 
 ---
 
@@ -325,6 +325,32 @@ Run on the live URL. ☐ = not yet run.
 **What didn't:** library and platform specifics. Every wrong answer was caught by running the code, never by reading it.
 **My value-add:** deciding what to cut, noticing UX flaws, and insisting on realistic data and tests that can fail.
 
+## Reflection against the class GenAI constitution
+My constitution has three principles: **personal growth** (keep learning and understanding what I'm doing), **high-quality work** (code that works, usable interfaces, tested), and **impact on the world** (including privacy and the cost of AI itself). Here is how each step measured up, including where I fell short.
+
+| Step | Growth | Quality | Impact / privacy |
+|---|---|---|---|
+| 1 Problem | AI challenged my framing; the idea and the problem statement are mine | Framed the problem before interviewing, so the evidence could contradict it | Scribe is a port of an existing product, not a brand-new idea; the value is local-first, web, open and reminders from interviews |
+| 2a Interviews | Used AI-drafted questions unedited, so I learned least here | Checked against the three interview rules; verbatim quotes | Participants anonymised as P1 and P2 |
+| 2b Requirements | I decided what to defer and what to build | Every need carries a quote; single-source needs labelled | Privacy became a requirement (R11) because a participant raised it |
+| 2c Research | Compared options myself; chose Vercel on my own judgment | Researched before building and planned the architecture before coding; the research was wrong on specifics | Chose local Whisper so transcription costs no server inference |
+| 2d Sketches | Start from my own draft and let AI extend it | Compared three directions before coding | Low-fi so polish couldn't decide |
+| 3 Prototype | **Biggest risk**: much of the code is AI-written | Ran every AI-written library call; broke code on purpose | Key stays server-side; rate limit is weak |
+| 4 Testing | Wrote and ran the checklist myself | 24 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
+
+**Where I'm honestly weakest**
+- **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). To keep this honest I treat each of those as something I must be able to explain in my own words, and I rebuilt my understanding from the build log rather than from the code alone.
+- **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap.
+- **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, much of the documentation, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
+- **Brand-new ideas.** AI didn't originate Scribe; it pressure-tested it. I don't claim it's novel.
+
+**Impact on the world**
+- **Cost of AI itself.** Every summary is a data-center inference. I reduced it by transcribing locally (the most compute-heavy part), using a small free-tier open model, and rate limiting. That's mitigation, not absolution: building the app with AI assistance also consumed compute.
+- **Privacy.** Audio never leaves the browser, but the transcript and notes are sent to a model provider to be summarised (Concentrate, where I work, disclosed above). Anyone using Scribe for sensitive meetings should know that. A fully local summary model would remove it and is future work.
+- **Jobs and ownership.** Scribe automates note-taking for the person using it rather than replacing a role, and it's open source. I don't have a full answer on the wider questions the constitution raises about authorship, remixing and data-center communities; I note them as unresolved.
+
+---
+
 ## Protocol for using GenAI on a project like this
 Distilled from the log above.
 
@@ -346,6 +372,7 @@ Distilled from the log above.
 4. Make AI try to break its own work; passing tests alone prove little.
 5. Keep judgment calls (scope, picks, who to believe) with the human, because AI's instinct is to include everything and agree.
 6. Check files exist where you expect after the tool says "written."
+7. Draft first, then have AI critique. Questions, sketches and problem statements I wrote myself got better with AI feedback; ones AI originated I understood least.
 
 ---
 
