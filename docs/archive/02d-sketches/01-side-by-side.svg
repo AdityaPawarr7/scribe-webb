@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="'Caveat', 'Comic Sans MS', cursive" font-size="16">
+  <defs>
+    <style>
+      .ink { stroke: #1a1a1a; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .ink-thin { stroke: #1a1a1a; stroke-width: 1.3; fill: none; stroke-linecap: round; }
+      .ink-dash { stroke: #666; stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+      .fill-paper { fill: #fdfcf7; }
+      .fill-hilite { fill: #fff2a8; }
+      .fill-tag { fill: #ffd1d1; }
+      .ink-txt { fill: #1a1a1a; }
+      .ink-sub { fill: #666; font-size: 12px; }
+      .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11px; fill: #333; }
+    </style>
+  </defs>
+  <rect width="900" height="560" class="fill-paper"/>
+  <!-- grid dots suggesting sketchbook -->
+  <g fill="#e9e3cf">
+    <!-- dots omitted for size -->
+  </g>
+
+  <text x="30" y="34" class="ink-txt" font-size="22">Sketch 1 — Side-by-side (the "safe" direction)</text>
+  <text x="30" y="54" class="ink-sub">What shipped as v1. Three columns, record at the top, meetings in the rail.</text>
+
+  <!-- outer frame -->
+  <path class="ink" d="M30 78 Q30 75 34 75 L866 76 Q870 76 870 80 L870 528 Q870 532 866 532 L34 531 Q30 531 30 527 Z"/>
+
+  <!-- sidebar -->
+  <path class="ink-thin" d="M30 78 L30 530 M190 78 L188 530"/>
+  <text x="42" y="100" class="ink-txt" font-weight="bold">Scribe · S</text>
+  <text x="42" y="118" class="ink-sub">+ new meeting</text>
+  <g>
+    <rect x="42" y="140" width="138" height="36" rx="6" class="fill-hilite" stroke="#1a1a1a" stroke-width="1.3"/>
+    <text x="52" y="156">Lecture — automata</text>
+    <text x="52" y="170" class="ink-sub">today · 42 min</text>
+  </g>
+  <g font-size="14">
+    <text x="52" y="200">crit — studio</text>
+    <text x="52" y="214" class="ink-sub">yest · 28 min</text>
+    <text x="52" y="238">1:1 w/ advisor</text>
+    <text x="52" y="252" class="ink-sub">mon · 18 min</text>
+    <text x="52" y="276">standup</text>
+    <text x="52" y="290" class="ink-sub">mon · 11 min</text>
+  </g>
+
+  <!-- toolbar -->
+  <g>
+    <rect x="206" y="94" width="100" height="30" rx="14" fill="#1a1a1a"/>
+    <text x="222" y="114" fill="#fdfcf7">● Record</text>
+    <rect x="315" y="98" width="80" height="22" rx="11" fill="none" stroke="#1a1a1a" stroke-width="1.3"/>
+    <text x="326" y="114" class="ink-sub">ready</text>
+    <text x="770" y="114" class="ink-sub">[ delete ]</text>
+  </g>
+
+  <!-- three columns -->
+  <g>
+    <path class="ink-thin" d="M206 140 L350 140 L350 500 L206 500 Z"/>
+    <text x="214" y="156" class="ink-sub" font-weight="bold">MY NOTES</text>
+    <text x="214" y="176">prof mentioned</text>
+    <text x="214" y="192">pumping lemma —</text>
+    <text x="214" y="208">applies when ∞ states</text>
+    <text x="214" y="224" font-size="14">◉ ask about Q4</text>
+    <text x="214" y="242" font-size="14">◉ example 2 again?</text>
+    <text x="214" y="270" class="mono">[cursor]</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M362 140 L556 140 L556 500 L362 500 Z"/>
+    <text x="370" y="156" class="ink-sub" font-weight="bold">TRANSCRIPT</text>
+    <text x="370" y="176">"So the pumping lemma</text>
+    <text x="370" y="192">says that for any</text>
+    <text x="370" y="208">regular language L..."</text>
+    <text x="370" y="226">"...we can split any</text>
+    <text x="370" y="242">string into xyz where..."</text>
+    <text x="370" y="266" class="ink-sub">(local Whisper, in-browser)</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M568 140 L854 140 L854 500 L568 500 Z"/>
+    <text x="576" y="156" class="ink-sub" font-weight="bold">ENHANCED NOTES</text>
+    <text x="576" y="180" font-weight="bold" font-size="18">Pumping Lemma — intro</text>
+    <text x="576" y="200" class="ink-sub">SUMMARY</text>
+    <text x="576" y="218">Prof introduced the pumping</text>
+    <text x="576" y="234">lemma for regular languages.</text>
+    <text x="576" y="258" class="ink-sub">ACTION ITEMS</text>
+    <text x="576" y="276">◉ review example 2</text>
+    <text x="576" y="294">◉ try Q4 before Fri</text>
+    <text x="576" y="318" class="ink-sub">OPEN QUESTIONS</text>
+    <text x="576" y="336">◉ when does step 3 fail?</text>
+  </g>
+
+  <!-- footnote -->
+  <text x="30" y="552" class="ink-sub">PROS: closest to the way people already take notes; CRUD maps 1:1.    CONS: three columns on a laptop is tight.</text>
+</svg>

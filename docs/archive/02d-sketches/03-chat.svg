@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="'Caveat', 'Comic Sans MS', cursive" font-size="16">
+  <defs>
+    <style>
+      .ink { stroke: #1a1a1a; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .ink-thin { stroke: #1a1a1a; stroke-width: 1.3; fill: none; stroke-linecap: round; }
+      .fill-paper { fill: #fdfcf7; }
+      .fill-bubble-you { fill: #fff2a8; }
+      .fill-bubble-ai { fill: #e9e3cf; }
+      .ink-txt { fill: #1a1a1a; }
+      .ink-sub { fill: #666; font-size: 12px; }
+      .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11px; fill: #333; }
+    </style>
+  </defs>
+  <rect width="900" height="560" class="fill-paper"/>
+
+  <text x="30" y="34" class="ink-txt" font-size="22">Sketch 3 — Chat-with-your-meeting (on-demand)</text>
+  <text x="30" y="54" class="ink-sub">No persistent summary on stop. The meeting is a corpus; you ask it questions when you need to.</text>
+
+  <path class="ink" d="M30 78 Q30 75 34 75 L866 76 Q870 76 870 80 L870 528 Q870 532 866 532 L34 531 Q30 531 30 527 Z"/>
+  <path class="ink-thin" d="M250 78 L250 530"/>
+
+  <!-- rail -->
+  <text x="42" y="100" font-weight="bold">Your meetings</text>
+  <g>
+    <rect x="42" y="118" width="196" height="46" rx="6" fill="#fff2a8" stroke="#1a1a1a" stroke-width="1.3"/>
+    <text x="54" y="138">Automata — pumping lemma</text>
+    <text x="54" y="156" class="ink-sub">today · 42 min · asked 3×</text>
+  </g>
+  <g font-size="14">
+    <text x="54" y="188">Studio crit — project 2</text>
+    <text x="54" y="204" class="ink-sub">yest · 28 min</text>
+    <text x="54" y="228">1:1 w/ advisor</text>
+    <text x="54" y="244" class="ink-sub">mon · 18 min</text>
+    <text x="54" y="268">Standup</text>
+    <text x="54" y="284" class="ink-sub">mon · 11 min</text>
+    <text x="54" y="308">Materials lecture</text>
+    <text x="54" y="324" class="ink-sub">fri · 50 min</text>
+  </g>
+  <text x="54" y="500" class="ink-sub">◉ Record new</text>
+
+  <!-- chat area -->
+  <text x="270" y="100" font-weight="bold">Ask about: Automata — pumping lemma</text>
+  <text x="270" y="118" class="ink-sub">Local transcript, 42:00. Scribe searches it to answer.</text>
+
+  <!-- bubbles -->
+  <g>
+    <path class="ink-thin" d="M270 142 L560 142 L560 180 L270 180 Z" fill="#fff2a8"/>
+    <text x="282" y="166">What did the prof say about the xy split rule?</text>
+    <text x="270" y="194" class="ink-sub">you · 00:00:12</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M300 210 L840 210 L840 300 L300 300 Z" fill="#e9e3cf"/>
+    <text x="312" y="232" font-weight="bold">Scribe</text>
+    <text x="312" y="252">He defined it as: s = xyz, with y not empty, and</text>
+    <text x="312" y="268">|xy| ≤ p. The point of the ≤ p constraint is that</text>
+    <text x="312" y="284">the pumping length lives in the prefix.</text>
+    <text x="300" y="316" class="ink-sub">cited from 00:19:40 — jump</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M270 338 L540 338 L540 376 L270 376 Z" fill="#fff2a8"/>
+    <text x="282" y="362">And what did I promise to do by Friday?</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M300 390 L800 390 L800 450 L300 450 Z" fill="#e9e3cf"/>
+    <text x="312" y="410" font-weight="bold">Scribe</text>
+    <text x="312" y="430">You wrote "ask about Q4" and "try Q4 before Fri".</text>
+    <text x="312" y="446" class="ink-sub">from your notes at 00:21:03</text>
+  </g>
+
+  <!-- input -->
+  <path class="ink" d="M270 480 L840 480 L840 510 L270 510 Z"/>
+  <text x="282" y="500" class="ink-sub">Ask anything about this meeting…</text>
+
+  <text x="30" y="552" class="ink-sub">PROS: fits P1's mental model (she already uses LLMs as a tutor) · minimal passive summary = less to be wrong.    CONS: no artifact to skim · costs an API call per question.</text>
+</svg>

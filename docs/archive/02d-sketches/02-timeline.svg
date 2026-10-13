@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="'Caveat', 'Comic Sans MS', cursive" font-size="16">
+  <defs>
+    <style>
+      .ink { stroke: #1a1a1a; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .ink-thin { stroke: #1a1a1a; stroke-width: 1.3; fill: none; stroke-linecap: round; }
+      .fill-paper { fill: #fdfcf7; }
+      .fill-tag { fill: #ffd1d1; }
+      .fill-tag2 { fill: #cfe8ff; }
+      .fill-tag3 { fill: #d4f0cc; }
+      .fill-hilite { fill: #fff2a8; }
+      .ink-txt { fill: #1a1a1a; }
+      .ink-sub { fill: #666; font-size: 12px; }
+      .mono { font-family: ui-monospace, Menlo, monospace; font-size: 11px; fill: #333; }
+    </style>
+  </defs>
+  <rect width="900" height="560" class="fill-paper"/>
+
+  <text x="30" y="34" class="ink-txt" font-size="22">Sketch 2 — Timeline-first (temporal)</text>
+  <text x="30" y="54" class="ink-sub">Session as a scrubbable timeline. Your typed notes pin to the moment you wrote them.</text>
+
+  <!-- summary band at top -->
+  <path class="ink" d="M30 78 Q30 75 34 75 L866 76 Q870 76 870 80 L870 148 Q870 152 866 152 L34 151 Q30 151 30 147 Z" fill="#fff8d8"/>
+  <text x="46" y="100" font-weight="bold" font-size="20">Pumping Lemma — intro · 42 min</text>
+  <text x="46" y="122" class="ink-sub">SUMMARY — 2 action items · 1 open question · pinned at 00:08, 00:21, 00:34</text>
+  <text x="46" y="140">Prof intro'd pumping lemma. Covered xyz split rule and ran through example 2.</text>
+
+  <!-- timeline -->
+  <path class="ink" d="M60 230 L840 230"/>
+  <g font-size="11" fill="#666">
+    <text x="54" y="252">0:00</text>
+    <text x="190" y="252">0:10</text>
+    <text x="326" y="252">0:20</text>
+    <text x="462" y="252">0:30</text>
+    <text x="598" y="252">0:40</text>
+    <text x="734" y="252">0:50</text>
+    <text x="830" y="252">end</text>
+  </g>
+  <g>
+    <circle cx="60" cy="230" r="5" fill="#1a1a1a"/>
+    <circle cx="196" cy="230" r="5" fill="#1a1a1a"/>
+    <circle cx="332" cy="230" r="5" fill="#1a1a1a"/>
+    <circle cx="468" cy="230" r="5" fill="#1a1a1a"/>
+    <circle cx="604" cy="230" r="5" fill="#1a1a1a"/>
+    <circle cx="740" cy="230" r="5" fill="#1a1a1a"/>
+  </g>
+
+  <!-- scrubber -->
+  <path class="ink" d="M400 210 L400 250"/>
+  <circle cx="400" cy="230" r="10" fill="#fff2a8" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- sticky notes pinned to timeline -->
+  <g>
+    <path class="ink-thin" d="M120 170 L240 170 L240 212 L120 212 Z" fill="#ffd1d1"/>
+    <path class="ink" d="M180 212 L180 228"/>
+    <text x="130" y="186">pumping lemma</text>
+    <text x="130" y="202">∞ states ⇒ regular</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M330 170 L446 170 L446 212 L330 212 Z" fill="#cfe8ff"/>
+    <path class="ink" d="M388 212 L388 228"/>
+    <text x="340" y="186">◉ ask about Q4</text>
+    <text x="340" y="202">example 2 again?</text>
+  </g>
+  <g>
+    <path class="ink-thin" d="M560 170 L672 170 L672 212 L560 212 Z" fill="#d4f0cc"/>
+    <path class="ink" d="M616 212 L616 228"/>
+    <text x="570" y="186">he said xyz split</text>
+    <text x="570" y="202">matters when |xy|≤p</text>
+  </g>
+
+  <!-- transcript band below timeline -->
+  <path class="ink" d="M30 290 L870 290 L870 500 L30 500 Z"/>
+  <text x="46" y="314" class="ink-sub" font-weight="bold">TRANSCRIPT · around 0:30</text>
+  <text x="46" y="338">"So we can split any string s into x, y, z where y is not empty..."</text>
+  <text x="46" y="358">"...and crucially the length of xy is at most p, the pumping length..."</text>
+  <text x="46" y="378" class="fill-hilite" fill="#000">   ◉ this is where you added "ask about Q4" ↑   </text>
+  <text x="46" y="402">"...now, if we pump y up or down, the resulting string still has to be in L."</text>
+  <text x="46" y="422">"Here's where this gets you — if you can show one length p where that fails..."</text>
+  <text x="46" y="462" class="ink-sub">▸ click any sticky above to jump the transcript. ▸ drag the scrubber to re-anchor.</text>
+
+  <text x="30" y="552" class="ink-sub">PROS: ties your reactions to the exact moment · great for crit feedback · rich affordance for review.    CONS: harder to search; a UX bet on linearity.</text>
+</svg>
