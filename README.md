@@ -13,14 +13,15 @@ Built for *Applied AI Tools — Project 1: Human-guided software development*. W
 ---
 
 ## Screenshots
-_Add 4–6 images to `docs/screenshots/` and link them here._
 
-| | |
-|---|---|
-| Meeting view: my notes, transcript, enhanced notes | _screenshot_ |
-| Recording and transcribing (progress %) | _screenshot_ |
-| Reminders dashboard | _screenshot_ |
-| Sample data loaded | _screenshot_ |
+**Meeting view** with sample data: my notes, transcript and enhanced notes side by side, SAMPLE badges in the sidebar.
+![Meeting view with sample data](docs/screenshots/meeting-view.png)
+
+**A real recording**, transcribed locally and summarised (the 41 s test clip, no notes typed).
+![Real recording: transcript and enhanced notes](docs/screenshots/real-recording.png)
+
+**Reminders dashboard:** open and done, due dates (overdue / today), and a backlink to the source meeting.
+![Reminders dashboard](docs/screenshots/reminders.png)
 
 ## How to use it
 1. Open the live demo in Chrome or Edge and click **+ new**.
