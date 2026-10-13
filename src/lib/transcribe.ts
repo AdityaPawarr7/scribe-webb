@@ -1,52 +1,25 @@
-// Local Whisper via transformers.js. Audio never leaves the browser.
-// transformers.js is DYNAMICALLY imported (eager import crashes under Vite dev).
-
-type Transcriber = (
-  audio: Float32Array,
-  opts?: Record<string, unknown>
-) => Promise<{ text: string } | { text: string }[]>
+// Local Whisper. Audio never leaves the browser.
+// Inference runs in a Web Worker (whisper.worker.ts) so long recordings
+// don't freeze the UI; progress and partial text stream back.
 
 export type LoadProgress = {
-  status: 'downloading' | 'loading' | 'ready'
+  status: 'downloading' | 'ready' | 'transcribing'
   file?: string
-  progress?: number
+  progress?: number // downloading: 0..100, transcribing: 0..1
 }
 
-let transcriberP: Promise<Transcriber> | null = null
+const MODEL_ID = 'Xenova/whisper-small.en'
 
-export async function getTranscriber(
-  modelId: string = 'Xenova/whisper-small.en',
-  onProgress?: (p: LoadProgress) => void
-): Promise<Transcriber> {
-  if (!transcriberP) {
-    transcriberP = (async () => {
-      const { pipeline, env } = await import('@xenova/transformers')
-      env.allowLocalModels = false
-      env.useBrowserCache = true
-      const pipe = await pipeline('automatic-speech-recognition', modelId, {
-        progress_callback: (p: {
-          status: string
-          file?: string
-          progress?: number
-        }) => {
-          if (p.status === 'progress' && onProgress) {
-            onProgress({ status: 'downloading', file: p.file, progress: p.progress })
-          } else if (p.status === 'ready' && onProgress) {
-            onProgress({ status: 'ready' })
-          }
-        }
-      })
-      return pipe as unknown as Transcriber
-    })()
+let worker: Worker | null = null
+function getWorker(): Worker {
+  if (!worker) {
+    worker = new Worker(new URL('./whisper.worker.ts', import.meta.url), { type: 'module' })
   }
-  return transcriberP
+  return worker
 }
 
-// Decode a Blob to a MONO Float32Array AT 16 kHz. Whisper requires 16 kHz;
-// giving it 48 kHz audio makes it emit [S] silence tokens because what it hears
-// is high-pitched garbage.
+// Decode a Blob to MONO Float32 at 16 kHz (Whisper's required rate).
 export async function blobToPcm16k(blob: Blob): Promise<Float32Array> {
-  // Step 1: decode at the file's native rate using a regular AudioContext.
   const AC: typeof AudioContext =
     (window as unknown as { AudioContext?: typeof AudioContext }).AudioContext ??
     (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
@@ -55,7 +28,6 @@ export async function blobToPcm16k(blob: Blob): Promise<Float32Array> {
   const decoded = await tmp.decodeAudioData(buf.slice(0))
   await tmp.close().catch(() => {})
 
-  // Step 2: downmix to mono at the original rate.
   const srcLen = decoded.length
   const srcRate = decoded.sampleRate
   const mono = new Float32Array(srcLen)
@@ -64,7 +36,6 @@ export async function blobToPcm16k(blob: Blob): Promise<Float32Array> {
     for (let i = 0; i < srcLen; i++) mono[i] += data[i] / decoded.numberOfChannels
   }
 
-  // Step 3: resample mono to 16 kHz via OfflineAudioContext.
   const dstRate = 16000
   if (srcRate === dstRate) return mono
   const dstLen = Math.ceil((srcLen * dstRate) / srcRate)
@@ -81,17 +52,27 @@ export async function blobToPcm16k(blob: Blob): Promise<Float32Array> {
 
 export async function transcribe(
   blob: Blob,
-  onProgress?: (p: LoadProgress) => void
+  onProgress?: (p: LoadProgress) => void,
+  onPartial?: (text: string) => void
 ): Promise<string> {
   const pcm = await blobToPcm16k(blob)
-  const t = await getTranscriber('Xenova/whisper-small.en', onProgress)
-  const out = await t(pcm, {
-    chunk_length_s: 30,
-    stride_length_s: 5,
-    language: 'english',
-    task: 'transcribe',
-    return_timestamps: false
+  const w = getWorker()
+  return new Promise<string>((resolve, reject) => {
+    w.onmessage = (e: MessageEvent) => {
+      const m = e.data as
+        | { type: 'model'; status: 'downloading' | 'ready'; file?: string; progress?: number }
+        | { type: 'partial'; text: string; progress: number }
+        | { type: 'done'; text: string }
+        | { type: 'error'; message: string }
+      if (m.type === 'model') onProgress?.({ status: m.status, file: m.file, progress: m.progress })
+      else if (m.type === 'partial') {
+        onProgress?.({ status: 'transcribing', progress: m.progress })
+        onPartial?.(m.text)
+      } else if (m.type === 'done') resolve(m.text)
+      else if (m.type === 'error') reject(new Error(m.message))
+    }
+    w.onerror = (e) => reject(new Error(e.message || 'Transcription worker crashed'))
+    // transfer the buffer instead of copying it (long audio = big array)
+    w.postMessage({ type: 'transcribe', modelId: MODEL_ID, audio: pcm }, [pcm.buffer])
   })
-  const text = Array.isArray(out) ? out.map((o) => o.text).join(' ') : out.text
-  return text.trim()
 }

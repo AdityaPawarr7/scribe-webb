@@ -66,7 +66,10 @@ export default function App() {
           durationSec: rec.durationSec
         })
 
-        const text = await transcribe(rec.blob, setModelProgress)
+        setModelProgress(null)
+        const text = await transcribe(rec.blob, setModelProgress, (partial) => {
+          void updateMeeting(m.id, { transcript: [{ t: 0, text: partial }] })
+        })
         await updateMeeting(m.id, { transcript: [{ t: 0, text }] })
 
         setStatus('summarizing')
@@ -326,6 +329,8 @@ function StatusPill({
       : status === 'transcribing'
       ? progress?.status === 'downloading'
         ? `downloading model ${Math.round(progress.progress ?? 0)}%`
+        : progress?.status === 'transcribing'
+        ? `transcribing locally… ${Math.round((progress.progress ?? 0) * 100)}%`
         : 'transcribing locally…'
       : status === 'summarizing'
       ? 'enhancing with Concentrate…'
