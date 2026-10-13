@@ -205,7 +205,10 @@ function dueLabel(ts: number, done: boolean): { label: string; tone: string } {
     ? `due today`
     : `due ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
   if (done) return { label, tone: '' }
-  if (ts < now) return { label: label + ' · overdue', tone: 'text-red-600 dark:text-red-400' }
-  if (ts - now < 24 * 60 * 60 * 1000) return { label, tone: 'text-amber-600 dark:text-amber-400' }
+  // overdue = due DATE is before today (a reminder due today is not overdue yet)
+  const startOfToday = new Date(now)
+  startOfToday.setHours(0, 0, 0, 0)
+  if (ts < startOfToday.getTime()) return { label: label + ' · overdue', tone: 'text-red-600 dark:text-red-400' }
+  if (sameDay || ts - now < 24 * 60 * 60 * 1000) return { label, tone: 'text-amber-600 dark:text-amber-400' }
   return { label, tone: '' }
 }

@@ -11,6 +11,7 @@ import {
   db
 } from './lib/db'
 import { RemindersView } from './components/RemindersView'
+import { clearSampleData, isSample, seedSampleData, SAMPLE_PREFIX } from './lib/seed'
 import { Recorder } from './lib/recorder'
 import { transcribe, type LoadProgress } from './lib/transcribe'
 
@@ -119,6 +120,7 @@ export default function App() {
           setCurrentId(m.id)
           setView('meetings')
         }}
+        onSampleCleared={() => setCurrentId(null)}
       />
       <main className="rounded-2xl border border-neutral-200/70 bg-white/70 p-5 shadow-sm backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60">
         {view === 'meetings' && (
@@ -157,7 +159,8 @@ function Sidebar({
   view,
   onViewChange,
   onSelect,
-  onNew
+  onNew,
+  onSampleCleared
 }: {
   meetings: Meeting[]
   currentId: string | null
@@ -165,6 +168,7 @@ function Sidebar({
   onViewChange: (v: 'meetings' | 'reminders') => void
   onSelect: (id: string) => void
   onNew: () => void
+  onSampleCleared: () => void
 }) {
   return (
     <aside className="rounded-2xl border border-neutral-200/70 bg-white/70 p-3 shadow-sm backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60">
@@ -210,7 +214,14 @@ function Sidebar({
                     : 'hover:bg-neutral-100 dark:hover:bg-neutral-800/70'
                 }`}
               >
-                <div className="truncate text-sm font-medium">{m.title}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-medium">{m.title}</span>
+                  {isSample(m.id) && (
+                    <span className="shrink-0 rounded bg-amber-200 px-1 text-[9px] font-semibold uppercase tracking-wide text-amber-900">
+                      sample
+                    </span>
+                  )}
+                </div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-[11px] opacity-70">
                   <span>{formatDate(m.createdAt)}</span>
                   <span>·</span>
@@ -221,7 +232,46 @@ function Sidebar({
           ))}
         </ul>
       ))}
+      <SampleDataControls onCleared={onSampleCleared} />
     </aside>
+  )
+}
+
+function SampleDataControls({ onCleared }: { onCleared: () => void }) {
+  const sampleCount = useLiveQuery(
+    () => db.meetings.where('id').startsWith(SAMPLE_PREFIX).count(),
+    [],
+    0
+  )
+  const [busy, setBusy] = useState(false)
+  const has = sampleCount > 0
+  return (
+    <div className="mt-4 border-t border-neutral-200 px-1 pt-3 dark:border-neutral-800">
+      <button
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true)
+          try {
+            if (has) {
+              await clearSampleData()
+              onCleared()
+            } else {
+              await seedSampleData()
+            }
+          } finally {
+            setBusy(false)
+          }
+        }}
+        className="text-[11px] text-neutral-500 underline-offset-2 transition hover:text-neutral-900 hover:underline disabled:opacity-50 dark:text-neutral-400 dark:hover:text-neutral-100"
+      >
+        {has ? 'Clear sample data' : 'Load sample data'}
+      </button>
+      <p className="mt-1 text-[10px] leading-snug text-neutral-400">
+        {has
+          ? 'Removes only the sample rows — your own meetings stay.'
+          : 'Adds fictional meetings + reminders for demos.'}
+      </p>
+    </div>
   )
 }
 
