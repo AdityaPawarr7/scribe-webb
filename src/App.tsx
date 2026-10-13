@@ -3,12 +3,14 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import ReactMarkdown from 'react-markdown'
 import {
   createMeeting,
+  createReminder,
   deleteMeeting,
   listMeetings,
   updateMeeting,
   type Meeting,
   db
 } from './lib/db'
+import { RemindersView } from './components/RemindersView'
 import { Recorder } from './lib/recorder'
 import { transcribe, type LoadProgress } from './lib/transcribe'
 
@@ -23,6 +25,7 @@ type Tab = 'enhanced' | 'raw'
 
 export default function App() {
   const meetings = useLiveQuery(() => listMeetings(), []) ?? []
+  const [view, setView] = useState<'meetings' | 'reminders'>('meetings')
   const [currentId, setCurrentId] = useState<string | null>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [modelProgress, setModelProgress] = useState<LoadProgress | null>(null)
@@ -105,28 +108,35 @@ export default function App() {
       <Sidebar
         meetings={meetings}
         currentId={currentId}
-        onSelect={setCurrentId}
+        view={view}
+        onViewChange={setView}
+        onSelect={(id) => { setCurrentId(id); setView('meetings') }}
         onNew={async () => {
           const m = await createMeeting()
           setCurrentId(m.id)
+          setView('meetings')
         }}
       />
       <main className="rounded-2xl border border-neutral-200/70 bg-white/70 p-5 shadow-sm backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60">
-        <Toolbar
-          status={status}
-          elapsed={elapsed}
-          modelProgress={modelProgress}
-          onRecord={onRecord}
-          canDelete={!!current}
-          onDelete={async () => {
-            if (!current) return
-            if (!confirm(`Delete "${current.title}"?`)) return
-            await deleteMeeting(current.id)
-            setCurrentId(null)
-          }}
-        />
+        {view === 'meetings' && (
+          <Toolbar
+            status={status}
+            elapsed={elapsed}
+            modelProgress={modelProgress}
+            onRecord={onRecord}
+            canDelete={!!current}
+            onDelete={async () => {
+              if (!current) return
+              if (!confirm(`Delete "${current.title}"?`)) return
+              await deleteMeeting(current.id)
+              setCurrentId(null)
+            }}
+          />
+        )}
         {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
-        {current ? (
+        {view === 'reminders' ? (
+          <RemindersView />
+        ) : current ? (
           <MeetingView meeting={current} tab={tab} onTabChange={setTab} />
         ) : (
           <Empty status={status} />
@@ -141,11 +151,15 @@ export default function App() {
 function Sidebar({
   meetings,
   currentId,
+  view,
+  onViewChange,
   onSelect,
   onNew
 }: {
   meetings: Meeting[]
   currentId: string | null
+  view: 'meetings' | 'reminders'
+  onViewChange: (v: 'meetings' | 'reminders') => void
   onSelect: (id: string) => void
   onNew: () => void
 }) {
@@ -154,18 +168,30 @@ function Sidebar({
       <div className="mb-3 flex items-center gap-2 px-1 pt-1">
         <LogoDot />
         <h1 className="text-sm font-semibold tracking-tight">Scribe · web</h1>
-        <button
-          onClick={onNew}
-          title="New meeting"
-          className="ml-auto rounded-md border border-neutral-200 px-2 py-0.5 text-xs text-neutral-600 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800/70"
-        >
-          + new
-        </button>
       </div>
-      <div className="mb-3 px-1 text-[11px] text-neutral-500 dark:text-neutral-400">
-        Local-first notes · nothing uploaded
+      <div className="mb-3 flex gap-1 rounded-lg bg-neutral-100/80 p-1 dark:bg-neutral-800/70">
+        <SideTab active={view === 'meetings'} onClick={() => onViewChange('meetings')}>
+          Meetings
+        </SideTab>
+        <SideTab active={view === 'reminders'} onClick={() => onViewChange('reminders')}>
+          Reminders
+        </SideTab>
       </div>
-      {meetings.length === 0 ? (
+      {view === 'meetings' && (
+        <div className="mb-2 flex items-center justify-between px-1">
+          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+            Local-first · nothing uploaded
+          </span>
+          <button
+            onClick={onNew}
+            title="New meeting"
+            className="rounded-md border border-neutral-200 px-2 py-0.5 text-xs text-neutral-600 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800/70"
+          >
+            + new
+          </button>
+        </div>
+      )}
+      {view === 'meetings' && (meetings.length === 0 ? (
         <div className="rounded-lg bg-neutral-100/60 px-2 py-3 text-xs text-neutral-500 dark:bg-neutral-800/50 dark:text-neutral-400">
           Nothing yet. Hit <b>Record</b> to start.
         </div>
@@ -191,8 +217,23 @@ function Sidebar({
             </li>
           ))}
         </ul>
-      )}
+      ))}
     </aside>
+  )
+}
+
+function SideTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition ${
+        active
+          ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100'
+          : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100'
+      }`}
+    >
+      {children}
+    </button>
   )
 }
 
@@ -335,15 +376,32 @@ function MeetingView({
         </div>
       </section>
       <section className="col-span-3 flex min-h-[32rem] flex-col">
-        <div className="mb-1.5 flex items-center justify-between">
+        <div className="mb-1.5 flex items-center justify-between gap-2">
           <Label className="!mb-0">Enhanced notes</Label>
-          <div className="flex gap-1 rounded-lg border border-neutral-200 p-0.5 text-[11px] dark:border-neutral-800">
-            <TabBtn active={tab === 'enhanced'} onClick={() => onTabChange('enhanced')}>
-              Rendered
-            </TabBtn>
-            <TabBtn active={tab === 'raw'} onClick={() => onTabChange('raw')}>
-              Raw
-            </TabBtn>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={async () => {
+                const seed = meeting.title && meeting.title !== 'Untitled meeting'
+                  ? `Follow up on: ${meeting.title}`
+                  : 'Follow up on this meeting'
+                const text = prompt('New reminder', seed)
+                if (!text) return
+                await createReminder({ text, meetingId: meeting.id })
+                alert('Reminder added — see the Reminders tab.')
+              }}
+              className="rounded-md border border-neutral-200 px-2 py-0.5 text-[11px] text-neutral-600 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800/70"
+              title="Create a reminder linked to this meeting"
+            >
+              + reminder
+            </button>
+            <div className="flex gap-1 rounded-lg border border-neutral-200 p-0.5 text-[11px] dark:border-neutral-800">
+              <TabBtn active={tab === 'enhanced'} onClick={() => onTabChange('enhanced')}>
+                Rendered
+              </TabBtn>
+              <TabBtn active={tab === 'raw'} onClick={() => onTabChange('raw')}>
+                Raw
+              </TabBtn>
+            </div>
           </div>
         </div>
         {tab === 'enhanced' ? (
