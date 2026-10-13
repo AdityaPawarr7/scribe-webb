@@ -18,7 +18,7 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 |---|---|
 | **Private by design** | Audio never leaves your browser; only transcript text is sent, and only when you ask for a summary |
 | **Free to run** | Local Whisper, free-tier model, no accounts |
-| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 20 automated tests |
+| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 24 automated tests |
 | **Built with documented AI use** | 16 logged experiments and a reusable protocol, below |
 
 **Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
@@ -243,9 +243,9 @@ Three deliberately low-fi directions so none seduces by polish.
 
 ## 4. Testing and deployment
 
-**Automated:** 20 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **20 / 20 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
+**Automated:** 24 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **24 / 24 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) the due-date label (including a regression test for the "due today shown as overdue" bug), and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
 
-**Do the tests catch bugs?** I broke the code on purpose: `deleteMeeting` no longer deleting audio → M-D1 failed; reminders sorted latest-first → R-R2 failed. Both reverted.
+**Do the tests catch bugs?** I broke the code on purpose: `deleteMeeting` no longer deleting audio → M-D1 failed; reminders sorted latest-first → R-R2 failed; the old overdue bug put back → D-1 failed. All reverted.
 **Other checks:** typecheck clean; build succeeds; `grep -R "sk-cn\|CONCENTRATE_API_KEY" dist/` finds nothing (R10).
 **Not covered by automation:** the UI, mic recording, Whisper, `/api/summarize`, rate limiting. That is the manual checklist.
 
@@ -307,7 +307,7 @@ Run on the live URL. ☐ = not yet run.
 | 12 | 3 | Reminders CRUD + dashboard | Type error (`useLiveQuery`), rewritten | ❌→✅ |
 | 13 | 4 | CRUD tests + sample data | 20 tests; `vitest` ERESOLVE fixed by pinning | ✅ |
 | 14 | 4 | Can the tests fail? | Broke code on purpose; M-D1, R-R2 failed | ✅ |
-| 15 | 4 | Due-today reminder showed overdue | Fixed `dueLabel`; found by seed data, not tests. TODO: add a test | ✅ |
+| 15 | 4 | Due-today reminder showed overdue | Fixed `dueLabel`; found by seed data, not tests. Regression test D-1 added afterwards | ✅ |
 | 16 | 3 | Docs written by a cloud tool I expected on my machine | File never arrived; restored by explicit copy | ❌→✅ |
 
 </details>
@@ -345,7 +345,7 @@ Distilled from the log above.
 npm install
 cp .env.example .env.local   # set CONCENTRATE_API_KEY (server-only; never prefix with VITE_)
 npm run dev                  # http://localhost:5173 (a dev middleware serves /api/summarize)
-npm test                     # 20 data-layer tests
+npm test                     # 24 tests
 npm run build
 ```
 Deploy: import this repo into Vercel and set `CONCENTRATE_API_KEY` (optionally `CONCENTRATE_BASE_URL`, `CONCENTRATE_MODEL`).
