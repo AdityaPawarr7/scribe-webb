@@ -5,14 +5,14 @@
 **A local-first AI meeting notepad for the browser.**
 Record a lecture, crit or meeting. Whisper transcribes it on your device; only the text goes to an LLM for a titled summary with action items.
 
-[**Live demo**](#) &nbsp;·&nbsp; [**Demo video**](#) &nbsp;·&nbsp; [Native app](https://github.com/AdityaPawarr7/scribe)
+[**Live demo**](https://scribe-webb.vercel.app/) &nbsp;·&nbsp; [**Demo video**](#) &nbsp;·&nbsp; [Native app](https://github.com/AdityaPawarr7/scribe)
 
 `Vite` `React` `TypeScript` `Tailwind` `Dexie / IndexedDB` `Whisper (in-browser)` `Vercel Edge` `Concentrate API`
 
 </div>
 
-> Built for *Applied AI Tools, Project 1: Human-guided software development*.
-> **Disclosure:** I work at Concentrate AI. Scribe uses the Concentrate API for model access.
+> Built for *Gen AI Software Development, Project 1: Human-guided software development*.
+> **Disclosure:** Scribe uses the Concentrate API for model access.
 
 | | |
 |---|---|
@@ -81,7 +81,7 @@ IndexedDB (meeting) + rendered UI
 
 ## 1. Problem
 
-> **When I'm actively participating in a lecture, crit or meeting, I lose track of what was said and what I committed to.** Notes come out one of two ways: incomplete because I was listening, or missing verbal context because I was writing. Presence costs capture; capture costs presence.
+> **When I'm actively participating in a lecture, critque or meeting, I lose track of what was said and what I committed to.** Notes come out one of two ways: incomplete because I was listening, or missing verbal context because I was writing. Presence costs capture; capture costs presence.
 
 **Who has it:** students in participation-heavy classes (concept-dense lectures, studio crits, labs), and anyone in meetings they also need to drive, especially people who revisit old sessions for exams, revisions or follow-ups.
 
@@ -341,7 +341,7 @@ My constitution has three principles: **personal growth** (keep learning and und
 **Where I'm honestly weakest**
 - **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). Each of those is something I need to be able to explain in my own words, and the build log is my record of what went wrong and why.
 - **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap.
-- **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, much of the documentation, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
+- **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, some documentation which extended my thoughts, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
 - **Brand-new ideas.** AI didn't originate Scribe; it pressure-tested it. I don't claim it's novel.
 
 **Impact on the world**
