@@ -294,7 +294,7 @@ Run on the live URL. ☐ = not yet run.
 | # | Step | What I asked | Result | |
 |---|---|---|---|---|
 | 1 | 1 | Pitched "open-source Granola, web, capped key" for feedback | Pushed back: that's a solution, not a problem; flagged audio limits and key exposure | ✅ |
-| 2 | 2a | Draft interview questions and project structure | Guide with a coverage map and a "don't say" list. **TODO:** record what I changed | ⏳ |
+| 2 | 2a | Draft interview questions and project structure | Guide with a coverage map, a "don't say" list and tailored follow-ups. I used it as generated, with no edits of my own, so the questions carry whatever blind spots the AI had | ⏳ |
 | 3 | 3 | Requirements from interviews; what did I miss? | Surfaced reminders (raised twice) as a gap; v1 vs deferred split | ✅ |
 | 4 | 2d | Three sketches + compare/contrast | 3 SVGs; I made the pick | ✅ |
 | 5 | 3 | Scaffold stack and record flow | Worked first pass | ✅ |
