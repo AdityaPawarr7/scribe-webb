@@ -339,7 +339,7 @@ My constitution has three principles: **personal growth** (keep learning and und
 | 4 Testing | Wrote and ran the checklist myself | 24 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
 
 **Where I'm honestly weakest**
-- **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). To keep this honest I treat each of those as something I must be able to explain in my own words, and I rebuilt my understanding from the build log rather than from the code alone.
+- **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). Each of those is something I need to be able to explain in my own words, and the build log is my record of what went wrong and why.
 - **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap.
 - **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, much of the documentation, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
 - **Brand-new ideas.** AI didn't originate Scribe; it pressure-tested it. I don't claim it's novel.
@@ -372,7 +372,7 @@ Distilled from the log above.
 4. Make AI try to break its own work; passing tests alone prove little.
 5. Keep judgment calls (scope, picks, who to believe) with the human, because AI's instinct is to include everything and agree.
 6. Check files exist where you expect after the tool says "written."
-7. Draft first, then have AI critique. Questions, sketches and problem statements I wrote myself got better with AI feedback; ones AI originated I understood least.
+7. Draft first, then have AI critique. The problem statement was mine and AI sharpened it; the interview guide was AI-originated and used unedited, and that's where I owned the result least.
 
 ---
 
