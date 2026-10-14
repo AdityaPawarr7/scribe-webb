@@ -18,7 +18,7 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 |---|---|
 | **Private by design** | Audio never leaves your browser; only transcript text is sent, and only when you ask for a summary |
 | **Free to run** | Local Whisper, free-tier model, no accounts |
-| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 24 automated tests |
+| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 27 automated tests |
 | **Built with documented AI use** | 16 logged experiments and a reusable protocol, below |
 
 **Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Constitution](#reflection-against-the-class-genai-constitution) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
@@ -40,7 +40,7 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 1. Open the live demo in Chrome or Edge and click **+ new**.
 2. Type rough notes if you like, then **Record** and allow the mic.
 3. Click **Stop**. The first time, the Whisper model downloads once and is cached; then the transcript appears with a progress indicator.
-4. Enhanced notes appear automatically. Toggle **Rendered / Raw** to see or edit the markdown.
+4. Enhanced notes appear automatically. Double-click the summary, or choose **Edit**, to change it (markdown); switch back to **Rendered** to see it formatted. Editing the `# heading` renames the meeting.
 5. Use **+ reminder** on an action item; manage reminders under the **Reminders** tab.
 6. No mic handy? Use the **sample data** buttons in the sidebar (fictional, badged SAMPLE, removable without touching your own data).
 
@@ -221,7 +221,7 @@ Three deliberately low-fi directions so none seduces by polish.
 
 ## 3. Prototype
 
-**Shipped:** mic recording; local Whisper in a Web Worker; editable notes beside the transcript; AI summary via an Edge function; Meetings CRUD with Rendered/Raw toggle; Reminders CRUD (second entity) with "+ reminder" and a backlink; sample-data seed/clear (`sample-` id prefix); in-memory rate limit; error boundary.
+**Shipped:** mic recording; local Whisper in a Web Worker; editable notes beside the transcript; AI summary via an Edge function; Meetings CRUD with an editable AI summary (Rendered/Edit); Reminders CRUD (second entity) with "+ reminder" and a backlink; sample-data seed/clear (`sample-` id prefix); in-memory rate limit; error boundary.
 **Cut:** tab audio, chat, streaming transcription, diarization, accounts/sync, calendar.
 
 <details>
@@ -233,7 +233,7 @@ Three deliberately low-fi directions so none seduces by polish.
 4. Summary API: AI assumed the wrong response shape; switched to the Responses API.
 5. Deploy: invalid runtime config, then a Fetch handler on Node; Edge runtime + try/catch fixed it.
 6. UX: typed notes were lost on a new meeting; redesigned to attach on Stop, added "+ new".
-7. Polish: stray untitled meetings removed, markdown styling, Rendered/Raw.
+7. Polish: stray untitled meetings removed, markdown styling, Rendered/Edit.
 8. Reminders built after P1's request (plus a type error fixed).
 9. Long-audio freeze: Whisper moved into a Web Worker (unverified on long audio).
 10. Tests and sample data; seed data exposed a "due today shows overdue" bug.
@@ -252,7 +252,7 @@ Three deliberately low-fi directions so none seduces by polish.
 
 ## 4. Testing and deployment
 
-**Automated:** 24 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **24 / 24 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) the due-date label (including a regression test for the "due today shown as overdue" bug), and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
+**Automated:** 27 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **27 / 27 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) the due-date label (including a regression test for the "due today shown as overdue" bug), title syncing for edited summaries, and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
 
 **Do the tests catch bugs?** I broke the code on purpose: `deleteMeeting` no longer deleting audio → M-D1 failed; reminders sorted latest-first → R-R2 failed; the old overdue bug put back → D-1 failed. All reverted.
 **Other checks:** typecheck clean; build succeeds; `grep -R "sk-cn\|CONCENTRATE_API_KEY" dist/` finds nothing (R10).
@@ -268,7 +268,7 @@ Run on the live URL. ☐ = not yet run.
 | T1 | Record ~15 s, Stop | Meeting appears; transcript fills locally | ☐ |
 | T2 | Same, with notes typed first via "+ new" | Summary reflects notes; notes kept | ☐ |
 | T3 | Wait for summary | Title, summary, action items render | ☐ |
-| T4 | Edit enhanced notes (Raw), refresh | Edit persists | ☐ |
+| T4 | Double-click the enhanced notes (or choose Edit), change text and the # heading, refresh | Edit persists; sidebar title follows the heading | ☐ |
 | T5 | Delete a meeting | Gone, also after refresh | ☐ |
 | T6 | Add a reminder with a due date | Appears under Open | ☐ |
 | T7 | Tick one; edit another | Moves to Done; edit persists | ☐ |
@@ -336,7 +336,7 @@ My constitution has three principles: **personal growth** (keep learning and und
 | 2c Research | Compared options myself; chose Vercel on my own judgment | Researched before building and planned the architecture before coding; the research was wrong on specifics | Chose local Whisper so transcription costs no server inference |
 | 2d Sketches | Start from my own draft and let AI extend it | Compared three directions before coding | Low-fi so polish couldn't decide |
 | 3 Prototype | **Biggest risk**: much of the code is AI-written | Ran every AI-written library call; broke code on purpose | Key stays server-side; rate limit is weak |
-| 4 Testing | Wrote and ran the checklist myself | 24 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
+| 4 Testing | Wrote and ran the checklist myself | 27 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
 
 **Where I'm honestly weakest**
 - **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). Each of those is something I need to be able to explain in my own words, and the build log is my record of what went wrong and why.
@@ -398,7 +398,7 @@ The sections above condense the per-step documents. The originals, including the
 npm install
 cp .env.example .env.local   # set CONCENTRATE_API_KEY (server-only; never prefix with VITE_)
 npm run dev                  # http://localhost:5173 (a dev middleware serves /api/summarize)
-npm test                     # 24 tests
+npm test                     # 27 tests
 npm run build
 ```
 Deploy: import this repo into Vercel and set `CONCENTRATE_API_KEY` (optionally `CONCENTRATE_BASE_URL`, `CONCENTRATE_MODEL`).

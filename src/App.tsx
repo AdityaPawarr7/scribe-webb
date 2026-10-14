@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import ReactMarkdown from 'react-markdown'
+import { titleFromMarkdown } from './lib/markdown'
 import {
   createMeeting,
   createReminder,
@@ -86,7 +87,7 @@ export default function App() {
         })
         if (res.ok) {
           const { markdown } = (await res.json()) as { markdown: string }
-          const title = markdown.match(/^#\s+(.+)$/m)?.[1]?.trim()
+          const title = titleFromMarkdown(markdown)
           await updateMeeting(m.id, {
             enhancedNotes: markdown,
             title: title || 'Untitled meeting'
@@ -454,15 +455,24 @@ function MeetingView({
                 Rendered
               </TabBtn>
               <TabBtn active={tab === 'raw'} onClick={() => onTabChange('raw')}>
-                Raw
+                Edit
               </TabBtn>
             </div>
           </div>
         </div>
         {tab === 'enhanced' ? (
-          <div className="prose-notes h-full overflow-auto rounded-xl border border-neutral-200 bg-white/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/40">
+          <div
+            onDoubleClick={() => onTabChange('raw')}
+            title="Double-click to edit"
+            className="prose-notes h-full cursor-text overflow-auto rounded-xl border border-neutral-200 bg-white/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/40"
+          >
             {meeting.enhancedNotes ? (
-              <ReactMarkdown>{meeting.enhancedNotes}</ReactMarkdown>
+              <>
+                <ReactMarkdown>{meeting.enhancedNotes}</ReactMarkdown>
+                <p className="mt-6 text-[11px] text-neutral-400">
+                  Double-click, or choose Edit, to change this summary.
+                </p>
+              </>
             ) : (
               <p className="text-sm text-neutral-400">
                 The AI summary lands here after you stop recording.
@@ -472,10 +482,15 @@ function MeetingView({
         ) : (
           <textarea
             value={meeting.enhancedNotes}
-            onChange={(e) =>
-              updateMeeting(meeting.id, { enhancedNotes: e.target.value })
-            }
-            placeholder="The AI summary lands here after you stop recording."
+            onChange={(e) => {
+              const value = e.target.value
+              const title = titleFromMarkdown(value)
+              updateMeeting(meeting.id, {
+                enhancedNotes: value,
+                ...(title ? { title } : {})
+              })
+            }}
+            placeholder="Edit the summary here (markdown). Switch to Rendered to see it formatted."
             className="h-full w-full resize-none rounded-xl border border-neutral-200 bg-white/60 p-4 font-mono text-xs leading-relaxed outline-none transition focus:border-neutral-400 focus:bg-white dark:border-neutral-800 dark:bg-neutral-900/40 dark:focus:bg-neutral-900"
           />
         )}
