@@ -76,7 +76,7 @@ IndexedDB (meeting) + rendered UI
 - Long recordings run in a Web Worker so the UI stays responsive, but this is **not yet verified on a long recording** (checklist T12).
 - Chrome/Edge on a laptop is the tested target.
 
-**Next:** chat with a meeting, tab audio, KV rate limits and spend cap, auto-delete audio after transcription, export/backup, timestamps on notes.
+**Next:** a visual layer (a map of themes and how ideas connect, requested by P1), a sharper point of difference (P2), chat with a meeting, tab audio, KV rate limits and spend cap, auto-delete audio after transcription, export/backup, timestamps on notes.
 
 ---
 
@@ -194,12 +194,19 @@ Other research conclusions: tab audio via `getDisplayMedia` is Chrome/Edge only;
 > - **What happened:** the API shape was exactly that kind of hallucination, caught by a 404 and a docs check, not by reviewing code. The pre-launch bundle grep for the key is clean (see testing).
 
 ### 2d. Sketches
-Three deliberately low-fi directions so none seduces by polish.
+Three deliberately low-fi directions so none seduces by polish. AI proposed the three directions as quick digital sketches; **I redrew each one by hand**, and the hand-drawn versions below are the ones I compared and picked from.
 
-| 1 Side-by-side | 2 Timeline | 3 Chat |
-|---|---|---|
-| ![](docs/sketches/01-side-by-side.svg) | ![](docs/sketches/02-timeline.svg) | ![](docs/sketches/03-chat.svg) |
-| Three columns: my notes, transcript, enhanced notes | Scrubbable timeline with sticky notes | Ask the meeting questions; no persistent summary |
+**Sketch 1: Side-by-side.** A meetings list, a transcript/notes column, and AI summary and actionables panels, with Record and Delete controls. *(Picked and built.)*
+
+![Hand-drawn sketch 1: side-by-side layout with meetings list, transcript/notes, AI summary and actionables](docs/screenshots/sketch-1-side-by-side.png)
+
+**Sketch 2: Session as a timeline.** A meeting name with a one-line summary, a timeline of key moments, the transcript below, and Reminders and Themes panels on the right. The Themes and Reminders panels are my own additions to the timeline direction.
+
+![Hand-drawn sketch 2: session as a timeline with key moments, transcript, reminders and themes](docs/screenshots/sketch-2-timeline.png)
+
+**Sketch 3: Chat with your meeting.** A meetings list on the left and an "Ask about Meeting #1" conversation on the right, with an input to ask the meeting questions and no persistent summary.
+
+![Hand-drawn sketch 3: chat interface for asking questions about a meeting](docs/screenshots/sketch-3-chat.png)
 
 | Dimension | Side-by-side | Timeline | Chat |
 |---|---|---|---|
@@ -214,7 +221,7 @@ Three deliberately low-fi directions so none seduces by polish.
 
 > **AI reflection**
 >
-> - **Helped:** I work from my own rough draft and feed it to AI to build on, which turns one idea into several comparable variations quickly. That let me compare three directions on paper before committing any to code.
+> - **Helped:** AI turned the problem into three distinct directions as quick digital sketches, which let me compare them before committing any to code. I then redrew each by hand and extended one (the timeline gained Reminders and Themes panels), which made me think through the layouts myself instead of accepting them.
 > - **Risk:** anchoring. If AI proposes the directions, my idea space shrinks to what it suggests, and a polished mockup of a weak idea reads as "ready to build".
 > - **Mitigation:** start from my own draft rather than a blank prompt, keep the sketches low-fi so none wins on polish, and write the compare-and-contrast and make the pick myself.
 > - **Creativity:** it helps with breadth (variations, alternatives I hadn't drawn) and hurts if I let it supply the first idea. The best use was as a second pair of hands on my sketch, not as the source.
@@ -285,7 +292,14 @@ Run on the live URL. ☐ = not yet run.
 
 </details>
 
-**Participant feedback:** _to do. Send the URL to P1 or P2, record what they tried, what they said (quotes), and what I changed._
+**Participant feedback** (both interview participants, anonymised; informal, after seeing the working prototype):
+
+| | What they said | What I'd do about it |
+|---|---|---|
+| **P1** | *"Love this. Hope it can graph stuff and visualize for me and make a brain map."* | Visualise a meeting: a map of its themes and how ideas connect. This is closest to the **Themes** panel in my timeline sketch (sketch 2), so that is where I'd start. It also fits P1's earlier wish for a clean overview across the mess of notes. |
+| **P2** | *"I like it, but it's like every other CS project. We need to make it stand out in the future."* | Fair. A transcribe-and-summarise notepad is a common project. The differentiators I'd lean on are the local-first privacy, reminders pulled from commitments, and a visual layer such as P1's brain map. I'd need to decide which one is the point rather than listing all three. |
+
+Two things stand out: P1's reaction was about the next capability, not a defect, and P2's was about distinctiveness, not usability. Neither reported a bug, but this is two people and it was informal, so it supports direction rather than proving the design.
 
 **Deployment:** Vercel (static build + Edge function). `CONCENTRATE_API_KEY` is only in Vercel environment variables. Abuse limits as in *Known limitations*: fine for a class demo, not for real traffic.
 
@@ -340,7 +354,7 @@ My constitution has three principles: **personal growth** (keep learning and und
 | 2a Interviews | Used AI-drafted questions unedited, so I learned least here | Checked against the three interview rules; verbatim quotes | Participants anonymised as P1 and P2 |
 | 2b Requirements | I decided what to defer and what to build | Every need carries a quote; single-source needs labelled | Privacy became a requirement (R11) because a participant raised it |
 | 2c Research | Compared options myself; chose Vercel on my own judgment | Researched before building and planned the architecture before coding; the research was wrong on specifics | Chose local Whisper so transcription costs no server inference |
-| 2d Sketches | Start from my own draft and let AI extend it | Compared three directions before coding | Low-fi so polish couldn't decide |
+| 2d Sketches | AI proposed the three directions; I redrew them by hand and extended them | Compared three directions before coding | Low-fi so polish couldn't decide |
 | 3 Prototype | **Biggest risk**: much of the code is AI-written | Ran every AI-written library call; broke code on purpose | Key stays server-side; rate limit is weak |
 | 4 Testing | Wrote and ran the checklist myself | 53 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
 
