@@ -38,7 +38,7 @@ A one-line title in Title Case.
 - bullet list; omit section if none
 
 ## Action items
-- bullet list; owner in **bold** when identifiable; omit section if none
+- bullet list; owner in **bold** when identifiable; keep any deadline in the speaker's own words (e.g. "by Friday"); omit section if none
 
 ## Open questions
 - bullet list; omit section if none

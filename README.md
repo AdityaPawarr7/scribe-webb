@@ -18,8 +18,8 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 |---|---|
 | **Private by design** | Audio never leaves your browser; only transcript text is sent, and only when you ask for a summary |
 | **Free to run** | Local Whisper, free-tier model, no accounts |
-| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 27 automated tests |
-| **Built with documented AI use** | 16 logged experiments and a reusable protocol, below |
+| **Two CRUD entities** | Meetings and Reminders, stored in IndexedDB, 53 automated tests |
+| **Built with documented AI use** | 17 logged experiments and a reusable protocol, below |
 
 **Jump to:** [Screenshots](#screenshots) · [Use it](#how-to-use-it) · [How it works](#how-it-works) · [1 Problem](#1-problem) · [2 Research](#2-research) · [3 Prototype](#3-prototype) · [4 Testing](#4-testing-and-deployment) · [GenAI experiments](#genai-experiments) · [Constitution](#reflection-against-the-class-genai-constitution) · [Protocol](#protocol-for-using-genai-on-a-project-like-this) · [Run locally](#run-locally)
 
@@ -41,7 +41,7 @@ Record a lecture, crit or meeting. Whisper transcribes it on your device; only t
 2. Type rough notes if you like, then **Record** and allow the mic.
 3. Click **Stop**. The first time, the Whisper model downloads once and is cached; then the transcript appears with a progress indicator.
 4. Enhanced notes appear automatically. Double-click the summary, or choose **Edit**, to change it (markdown); switch back to **Rendered** to see it formatted. Editing the `# heading` renames the meeting.
-5. Use **+ reminder** on an action item; manage reminders under the **Reminders** tab.
+5. A **Suggested reminders** panel appears with the action items Scribe found, with due dates already read from words like "by Friday". Edit, tick, and press **Add**; nothing is saved until you do. Press **Suggest reminders** any time to run it again, or **+ reminder** to add one by hand. Manage them under the **Reminders** tab.
 6. No mic handy? Use the **sample data** buttons in the sidebar (fictional, badged SAMPLE, removable without touching your own data).
 
 ## How it works
@@ -72,6 +72,7 @@ IndexedDB (meeting) + rendered UI
 **Known limitations**
 - Rate limiting is basic: per-IP 20/hour in memory, resets on cold start, **no global spend cap**. Stopgaps: a free-tier model and a spend limit on the key. KV-backed limits are the next job.
 - Mic only; tab audio (Meet/Zoom in a browser) was cut from v1.
+- Reminder dates are read from English phrases by simple rules (weekdays, "tomorrow", "in 3 days", "Oct 20"), so always check the date before adding. Reminders are an in-app dashboard; Scribe does not send notifications.
 - Long recordings run in a Web Worker so the UI stays responsive, but this is **not yet verified on a long recording** (checklist T12).
 - Chrome/Edge on a laptop is the tested target.
 
@@ -142,7 +143,7 @@ Quotes: P2, *"Copying it down, but then I lose the train of thought for a second
 | N4 | Reminders for commitments made in a session | P1 only |
 | N5 | Privacy by default (notes, local) | P1; plus the class constitution |
 
-**User stories:** (1) record and transcribe on-device so I stay present; (2) add my own notes alongside; (3) an AI summary with action items that reads cleanly later; (4) edit the AI summary; (5) a searchable list of all meetings; (6) turn action items into reminders with due dates; (7) delete a meeting or reminder.
+**User stories:** (1) record and transcribe on-device so I stay present; (2) add my own notes alongside; (3) an AI summary with action items that reads cleanly later; (4) edit the AI summary; (5) a searchable list of all meetings; (6) turn action items into reminders with due dates; (7) delete a meeting or reminder; (8) have the action items found in my summary offered as reminders, with due dates I can adjust, so I don't retype them.
 
 | Requirement ("the app must…") | Entity | CRUD |
 |---|---|---|
@@ -157,8 +158,9 @@ Quotes: P2, *"Copying it down, but then I lose the train of thought for a second
 | R9 Delete a reminder | Reminder | D |
 | R10 API key never reaches the browser; rate limited | — | security |
 | R11 Audio never leaves the device | — | privacy |
+| R12 Suggest reminders from a summary's action items, with due dates; the user confirms before anything is saved | Reminder | C |
 
-Reminders were originally deferred because they came from one participant. After P1 raised them twice unprompted I built them as the second entity.
+Reminders were originally deferred because they came from one participant. After P1 raised them twice unprompted I built them as the second entity. Later they became automatic suggestions: Scribe reads the summary's action items and proposes reminders with due dates, but the user confirms each one (R12).
 
 > **AI reflection**
 >
@@ -221,7 +223,7 @@ Three deliberately low-fi directions so none seduces by polish.
 
 ## 3. Prototype
 
-**Shipped:** mic recording; local Whisper in a Web Worker; editable notes beside the transcript; AI summary via an Edge function; Meetings CRUD with an editable AI summary (Rendered/Edit); Reminders CRUD (second entity) with "+ reminder" and a backlink; sample-data seed/clear (`sample-` id prefix); in-memory rate limit; error boundary.
+**Shipped:** mic recording; local Whisper in a Web Worker; editable notes beside the transcript; AI summary via an Edge function; Meetings CRUD with an editable AI summary (Rendered/Edit); Reminders CRUD (second entity) with "+ reminder" and a backlink; **automatic reminder suggestions** from the summary's action items (due dates read from the wording, editable, nothing saved until confirmed); sample-data seed/clear (`sample-` id prefix); in-memory rate limit; error boundary.
 **Cut:** tab audio, chat, streaming transcription, diarization, accounts/sync, calendar.
 
 <details>
@@ -237,6 +239,7 @@ Three deliberately low-fi directions so none seduces by polish.
 8. Reminders built after P1's request (plus a type error fixed).
 9. Long-audio freeze: Whisper moved into a Web Worker (unverified on long audio).
 10. Tests and sample data; seed data exposed a "due today shows overdue" bug.
+11. Auto-suggested reminders: an action-item extractor, an English date parser, de-duplication and a confirm-before-save panel, built test-first. The parser's own tests caught it reading "3/4 of the class" as March 4.
 
 </details>
 
@@ -252,14 +255,14 @@ Three deliberately low-fi directions so none seduces by polish.
 
 ## 4. Testing and deployment
 
-**Automated:** 27 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **27 / 27 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) the due-date label (including a regression test for the "due today shown as overdue" bug), title syncing for edited summaries, and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
+**Automated:** 53 Vitest tests (`npm test`, with `fake-indexeddb` so the real Dexie layer runs in Node): **53 / 53 pass**. They cover Create/Read/Update/Delete on both entities (ordering, defaults, partial updates, deleting audio with its meeting, pending/done split, soonest-due-first sort) the due-date label (including a regression test for the "due today shown as overdue" bug), title syncing for edited summaries, action-item extraction, date parsing (weekdays, relative words, explicit dates, plus false positives such as fractions), suggestion de-duplication, and the sample-data logic (no duplicates, never overwrites edits, clearing never touches your own rows).
 
 **Do the tests catch bugs?** I broke the code on purpose: `deleteMeeting` no longer deleting audio → M-D1 failed; reminders sorted latest-first → R-R2 failed; the old overdue bug put back → D-1 failed. All reverted.
 **Other checks:** typecheck clean; build succeeds; `grep -R "sk-cn\|CONCENTRATE_API_KEY" dist/` finds nothing (R10).
 **Not covered by automation:** the UI, mic recording, Whisper, `/api/summarize`, rate limiting. That is the manual checklist.
 
 <details>
-<summary><b>Manual test checklist (T1 to T12, not yet run)</b></summary>
+<summary><b>Manual test checklist (T1 to T14, not yet run)</b></summary>
 
 Run on the live URL. ☐ = not yet run.
 
@@ -277,6 +280,8 @@ Run on the live URL. ☐ = not yet run.
 | T10 | Load, then clear sample data | SAMPLE rows appear, then vanish; yours stay | ☐ |
 | T11 | DevTools → Network while recording | No audio uploaded; only `/api/summarize` carries text | ☐ |
 | T12 | Record 5+ min | UI stays responsive; progress % updates | ☐ |
+| T13 | Record the demo conversation (decisions and action items with "Friday", "Wednesday", "today") | Suggested reminders panel appears; dates are right; adding creates linked reminders | ☐ |
+| T14 | Press **Suggest reminders** again on the same meeting | Added items are not suggested twice | ☐ |
 
 </details>
 
@@ -296,7 +301,7 @@ Run on the live URL. ☐ = not yet run.
 
 ## GenAI experiments
 <details>
-<summary><b>Full experiment log (16 entries)</b></summary>
+<summary><b>Full experiment log (17 entries)</b></summary>
 
 ✅ worked, ❌→✅ failed first then fixed, ⏳ unverified.
 
@@ -318,6 +323,7 @@ Run on the live URL. ☐ = not yet run.
 | 14 | 4 | Can the tests fail? | Broke code on purpose; M-D1, R-R2 failed | ✅ |
 | 15 | 4 | Due-today reminder showed overdue | Fixed `dueLabel`; found by seed data, not tests. Regression test D-1 added afterwards | ✅ |
 | 16 | 3 | Docs written by a cloud tool I expected on my machine | File never arrived; restored by explicit copy | ❌→✅ |
+| 17 | 3 | Auto-create reminders from action items, full freedom on design | Extractor, date parser, confirm-before-save panel and 26 tests. First parser read "3/4 of the class" as March 4; its false-positive test caught it. UI not yet clicked through | ❌→✅ |
 
 </details>
 
@@ -336,17 +342,18 @@ My constitution has three principles: **personal growth** (keep learning and und
 | 2c Research | Compared options myself; chose Vercel on my own judgment | Researched before building and planned the architecture before coding; the research was wrong on specifics | Chose local Whisper so transcription costs no server inference |
 | 2d Sketches | Start from my own draft and let AI extend it | Compared three directions before coding | Low-fi so polish couldn't decide |
 | 3 Prototype | **Biggest risk**: much of the code is AI-written | Ran every AI-written library call; broke code on purpose | Key stays server-side; rate limit is weak |
-| 4 Testing | Wrote and ran the checklist myself | 27 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
+| 4 Testing | Wrote and ran the checklist myself | 53 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
 
 **Where I'm honestly weakest**
 - **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). Each of those is something I need to be able to explain in my own words, and the build log is my record of what went wrong and why.
-- **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap.
+- **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap. Reminder due dates come from heuristic English date rules; I mitigate that by showing every suggestion for review before saving, but the parser can still guess wrong.
 - **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, some documentation which extended my thoughts, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
 - **Brand-new ideas.** AI didn't originate Scribe; it pressure-tested it. I don't claim it's novel.
 
 **Impact on the world**
 - **Cost of AI itself.** Every summary is a data-center inference. I reduced it by transcribing locally (the most compute-heavy part), using a small free-tier open model, and rate limiting. That's mitigation, not absolution: building the app with AI assistance also consumed compute.
 - **Privacy.** Audio never leaves the browser, but the transcript and notes are sent to a model provider to be summarised (Concentrate, where I work, disclosed above). Anyone using Scribe for sensitive meetings should know that. A fully local summary model would remove it and is future work.
+- **Automation with a human in the loop.** Reminders are suggested, not created silently: the user reviews, edits and confirms. That keeps me responsible for what ends up in my own task list, in line with the growth and quality principles. The suggestion logic runs locally, so it sends nothing extra to a model.
 - **Jobs and ownership.** Scribe automates note-taking for the person using it rather than replacing a role, and it's open source. I don't have a full answer on the wider questions the constitution raises about authorship, remixing and data-center communities; I note them as unresolved.
 
 ---
@@ -398,7 +405,7 @@ The sections above condense the per-step documents. The originals, including the
 npm install
 cp .env.example .env.local   # set CONCENTRATE_API_KEY (server-only; never prefix with VITE_)
 npm run dev                  # http://localhost:5173 (a dev middleware serves /api/summarize)
-npm test                     # 27 tests
+npm test                     # 53 tests
 npm run build
 ```
 Deploy: import this repo into Vercel and set `CONCENTRATE_API_KEY` (optionally `CONCENTRATE_BASE_URL`, `CONCENTRATE_MODEL`).

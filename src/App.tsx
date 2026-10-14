@@ -12,6 +12,8 @@ import {
   db
 } from './lib/db'
 import { RemindersView } from './components/RemindersView'
+import { SuggestedReminders } from './components/SuggestedReminders'
+import { suggestReminders, type Suggestion } from './lib/suggest'
 import { clearSampleData, isSample, seedSampleData, SAMPLE_PREFIX } from './lib/seed'
 import { Recorder } from './lib/recorder'
 import { transcribe, type LoadProgress } from './lib/transcribe'
@@ -35,6 +37,14 @@ export default function App() {
   const [recorder] = useState(() => new Recorder())
   const [tab, setTab] = useState<Tab>('enhanced')
   const [elapsed, setElapsed] = useState(0)
+  const [suggest, setSuggest] = useState<{ meetingId: string; items: Suggestion[] } | null>(null)
+
+  async function openSuggestions(meetingId: string, markdown: string, onlyIfAny = false) {
+    const existing = await db.reminders.toArray()
+    const items = suggestReminders(markdown, meetingId, existing)
+    if (onlyIfAny && items.length === 0) return
+    setSuggest({ meetingId, items })
+  }
   const current = useMemo(
     () => meetings.find((m) => m.id === currentId) ?? null,
     [meetings, currentId]
@@ -92,6 +102,8 @@ export default function App() {
             enhancedNotes: markdown,
             title: title || 'Untitled meeting'
           })
+          // Offer reminders for the action items; the user confirms before anything is saved.
+          void openSuggestions(m.id, markdown, true)
         } else {
           const detail = await res.text()
           setError(`Summary failed (${res.status}): ${detail.slice(0, 200)}`)
@@ -143,7 +155,15 @@ export default function App() {
         {view === 'reminders' ? (
           <RemindersView />
         ) : current ? (
-          <MeetingView meeting={current} tab={tab} onTabChange={setTab} />
+          <MeetingView
+            meeting={current}
+            tab={tab}
+            onTabChange={setTab}
+            suggestions={suggest?.meetingId === current.id ? suggest.items : null}
+            onSuggest={() => openSuggestions(current.id, current.enhancedNotes)}
+            onCloseSuggestions={() => setSuggest(null)}
+            onOpenReminders={() => setView('reminders')}
+          />
         ) : (
           <Empty status={status} />
         )}
@@ -406,11 +426,19 @@ function StatusPill({
 function MeetingView({
   meeting,
   tab,
-  onTabChange
+  onTabChange,
+  suggestions,
+  onSuggest,
+  onCloseSuggestions,
+  onOpenReminders
 }: {
   meeting: Meeting
   tab: Tab
   onTabChange: (t: Tab) => void
+  suggestions: Suggestion[] | null
+  onSuggest: () => void
+  onCloseSuggestions: () => void
+  onOpenReminders: () => void
 }) {
   return (
     <div className="grid grid-cols-5 gap-5">
@@ -436,6 +464,14 @@ function MeetingView({
           <Label className="!mb-0">Enhanced notes</Label>
           <div className="flex items-center gap-2">
             <button
+              onClick={onSuggest}
+              disabled={!meeting.enhancedNotes}
+              className="rounded-md border border-neutral-200 px-2 py-0.5 text-[11px] text-neutral-600 transition enabled:hover:bg-neutral-100 disabled:opacity-40 dark:border-neutral-700 dark:text-neutral-300 dark:enabled:hover:bg-neutral-800/70"
+              title="Find action items in this summary and offer them as reminders"
+            >
+              Suggest reminders
+            </button>
+            <button
               onClick={async () => {
                 const seed = meeting.title && meeting.title !== 'Untitled meeting'
                   ? `Follow up on: ${meeting.title}`
@@ -460,6 +496,18 @@ function MeetingView({
             </div>
           </div>
         </div>
+        {suggestions && (
+          <SuggestedReminders
+            key={meeting.id + ':' + suggestions.map((s) => s.key).join('|')}
+            meetingId={meeting.id}
+            items={suggestions}
+            onClose={onCloseSuggestions}
+            onOpenReminders={() => {
+              onCloseSuggestions()
+              onOpenReminders()
+            }}
+          />
+        )}
         {tab === 'enhanced' ? (
           <div
             onDoubleClick={() => onTabChange('raw')}
