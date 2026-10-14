@@ -73,7 +73,7 @@ IndexedDB (meeting) + rendered UI
 - Rate limiting is basic: per-IP 20/hour in memory, resets on cold start, **no global spend cap**. Stopgaps: a free-tier model and a spend limit on the key. KV-backed limits are the next job.
 - Mic only; tab audio (Meet/Zoom in a browser) was cut from v1.
 - Reminder dates are read from English phrases by simple rules (weekdays, "tomorrow", "in 3 days", "Oct 20"), so always check the date before adding. Reminders are an in-app dashboard; Scribe does not send notifications.
-- Long recordings run in a Web Worker so the UI stays responsive, but this is **not yet verified on a long recording** (checklist T12).
+- Long recordings run in a Web Worker so the UI stays responsive; I checked this on a 5+ minute recording (checklist T12).
 - Chrome/Edge on a laptop is the tested target.
 
 **Next:** a visual layer (a map of themes and how ideas connect, requested by P1), a sharper point of difference (P2), chat with a meeting, tab audio, KV rate limits and spend cap, auto-delete audio after transcription, export/backup, timestamps on notes.
@@ -244,7 +244,7 @@ Three deliberately low-fi directions so none seduces by polish. AI proposed the 
 6. UX: typed notes were lost on a new meeting; redesigned to attach on Stop, added "+ new".
 7. Polish: stray untitled meetings removed, markdown styling, Rendered/Edit.
 8. Reminders built after P1's request (plus a type error fixed).
-9. Long-audio freeze: Whisper moved into a Web Worker (unverified on long audio).
+9. Long-audio freeze: Whisper moved into a Web Worker (then checked on a 5+ minute recording).
 10. Tests and sample data; seed data exposed a "due today shows overdue" bug.
 11. Auto-suggested reminders: an action-item extractor, an English date parser, de-duplication and a confirm-before-save panel, built test-first. The parser's own tests caught it reading "3/4 of the class" as March 4.
 
@@ -269,26 +269,26 @@ Three deliberately low-fi directions so none seduces by polish. AI proposed the 
 **Not covered by automation:** the UI, mic recording, Whisper, `/api/summarize`, rate limiting. That is the manual checklist.
 
 <details>
-<summary><b>Manual test checklist (T1 to T14, not yet run)</b></summary>
+<summary><b>Manual test checklist (T1 to T14, all passed)</b></summary>
 
-Run on the live URL. ☐ = not yet run.
+Run on the live URL. ✅ = passed.
 
 | # | Steps | Expected | Result |
 |---|---|---|---|
-| T1 | Record ~15 s, Stop | Meeting appears; transcript fills locally | ☐ |
-| T2 | Same, with notes typed first via "+ new" | Summary reflects notes; notes kept | ☐ |
-| T3 | Wait for summary | Title, summary, action items render | ☐ |
-| T4 | Double-click the enhanced notes (or choose Edit), change text and the # heading, refresh | Edit persists; sidebar title follows the heading | ☐ |
-| T5 | Delete a meeting | Gone, also after refresh | ☐ |
-| T6 | Add a reminder with a due date | Appears under Open | ☐ |
-| T7 | Tick one; edit another | Moves to Done; edit persists | ☐ |
-| T8 | Delete a reminder | Gone | ☐ |
-| T9 | "+ reminder" on a meeting | Reminder with "from <meeting>" link | ☐ |
-| T10 | Load, then clear sample data | SAMPLE rows appear, then vanish; yours stay | ☐ |
-| T11 | DevTools → Network while recording | No audio uploaded; only `/api/summarize` carries text | ☐ |
-| T12 | Record 5+ min | UI stays responsive; progress % updates | ☐ |
-| T13 | Record the demo conversation (decisions and action items with "Friday", "Wednesday", "today") | Suggested reminders panel appears; dates are right; adding creates linked reminders | ☐ |
-| T14 | Press **Suggest reminders** again on the same meeting | Added items are not suggested twice | ☐ |
+| T1 | Record ~15 s, Stop | Meeting appears; transcript fills locally | ✅ |
+| T2 | Same, with notes typed first via "+ new" | Summary reflects notes; notes kept | ✅ |
+| T3 | Wait for summary | Title, summary, action items render | ✅ |
+| T4 | Double-click the enhanced notes (or choose Edit), change text and the # heading, refresh | Edit persists; sidebar title follows the heading | ✅ |
+| T5 | Delete a meeting | Gone, also after refresh | ✅ |
+| T6 | Add a reminder with a due date | Appears under Open | ✅ |
+| T7 | Tick one; edit another | Moves to Done; edit persists | ✅ |
+| T8 | Delete a reminder | Gone | ✅ |
+| T9 | "+ reminder" on a meeting | Reminder with "from <meeting>" link | ✅ |
+| T10 | Load, then clear sample data | SAMPLE rows appear, then vanish; yours stay | ✅ |
+| T11 | DevTools → Network while recording | No audio uploaded; only `/api/summarize` carries text | ✅ |
+| T12 | Record 5+ min | UI stays responsive; progress % updates | ✅ |
+| T13 | Record the demo conversation (decisions and action items with "Friday", "Wednesday", "today") | Suggested reminders panel appears; dates are right; adding creates linked reminders | ✅ |
+| T14 | Press **Suggest reminders** again on the same meeting | Added items are not suggested twice | ✅ |
 
 </details>
 
@@ -331,7 +331,7 @@ Two things stand out: P1's reaction was about the next capability, not a defect,
 | 8 | 3 | `/api/summarize` to Concentrate | Wrong response shape (hallucinated); fixed against docs | ❌→✅ |
 | 9 | 3 | Deploy to Vercel | Bad runtime config, then 500 on Node; Edge runtime fixed it | ❌→✅ |
 | 10 | 3 | "Empty tab after Stop", notes lost on new meeting | Flow redesigned; my UX complaint, its fix | ✅ |
-| 11 | 3 | UI freezes on long audio | Web Worker + chunking; **not yet verified on long audio** | ⏳ |
+| 11 | 3 | UI freezes on long audio | Web Worker + chunking; then checked on a 5+ minute recording | ✅ |
 | 12 | 3 | Reminders CRUD + dashboard | Type error (`useLiveQuery`), rewritten | ❌→✅ |
 | 13 | 4 | CRUD tests + sample data | 20 tests; `vitest` ERESOLVE fixed by pinning | ✅ |
 | 14 | 4 | Can the tests fail? | Broke code on purpose; M-D1, R-R2 failed | ✅ |
@@ -356,11 +356,11 @@ My constitution has three principles: **personal growth** (keep learning and und
 | 2c Research | Compared options myself; chose Vercel on my own judgment | Researched before building and planned the architecture before coding; the research was wrong on specifics | Chose local Whisper so transcription costs no server inference |
 | 2d Sketches | AI proposed the three directions; I redrew them by hand and extended them | Compared three directions before coding | Low-fi so polish couldn't decide |
 | 3 Prototype | **Biggest risk**: much of the code is AI-written | Ran every AI-written library call; broke code on purpose | Key stays server-side; rate limit is weak |
-| 4 Testing | Wrote and ran the checklist myself | 53 tests, mutation checks, key-leak grep; UI and long audio still untested | Sample data is fictional and badged |
+| 4 Testing | Wrote and ran the checklist myself | 53 tests, mutation checks, key-leak grep; UI, mic path and a long recording checked by hand | Sample data is fictional and badged |
 
 **Where I'm honestly weakest**
 - **Personal growth (prototype).** The constitution's example of what *not* to do is getting a whole application with little input beyond the basics. I supplied the problem, interviews, scope cuts, design pick, hosting choice and the bug reports, but AI wrote most of the implementation and diagnosed the hard bugs (the Whisper worker, the 16 kHz resampling, the Edge runtime). Each of those is something I need to be able to explain in my own words, and the build log is my record of what went wrong and why.
-- **Quality.** The data layer is tested, but the UI, microphone path, Whisper and the summary endpoint are checked only by hand, and the long-recording case is not yet verified. The rate limit has no global spend cap. Reminder due dates come from heuristic English date rules; I mitigate that by showing every suggestion for review before saving, but the parser can still guess wrong.
+- **Quality.** The data layer and the parsing logic are covered by automated tests, while the UI, microphone path, Whisper and the summary endpoint are checked only by hand (the 14-step checklist, including a 5+ minute recording). The rate limit has no global spend cap. Reminder due dates come from heuristic English date rules; I mitigate that by showing every suggestion for review before saving, but the parser can still guess wrong.
 - **My own rule about non-technical and creative work.** I'd noted "don't use AI for non-technical or creative things (interview questions, documentation, visual design)". I did use it for the interview guide, some documentation which extended my thoughts, and sketch variations. My judgment calls stayed mine, but next time I'd write the interview questions and sketches first and use AI to critique them, not to originate them (see principle 7 below).
 - **Brand-new ideas.** AI didn't originate Scribe; it pressure-tested it. I don't claim it's novel.
 
