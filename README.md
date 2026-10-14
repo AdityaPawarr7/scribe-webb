@@ -5,7 +5,7 @@
 **A local-first AI meeting notepad for the browser.**
 Record a lecture, crit or meeting. Whisper transcribes it on your device; only the text goes to an LLM for a titled summary with action items.
 
-[**Live demo**](https://scribe-webb.vercel.app/) &nbsp;·&nbsp; [**Demo video**](#) &nbsp;·&nbsp; [Native app](https://github.com/AdityaPawarr7/scribe)
+[**Live demo**](https://scribe-webb.vercel.app/) &nbsp;·&nbsp; [**Demo video**](https://www.youtube.com/watch?v=X-MYvb2jfRE) &nbsp;·&nbsp; [Native app](https://github.com/AdityaPawarr7/scribe)
 
 `Vite` `React` `TypeScript` `Tailwind` `Dexie / IndexedDB` `Whisper (in-browser)` `Vercel Edge` `Concentrate API`
 
